@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+{% block title %}Record Audio{% endblock %}
+{% block content %}
+<h1>Welcome, {{ user_name }}</h1>
+<h2>English Recording</h2>
+<p>{{ english_text }}</p>
+<button id="startRecordingEnglish">Start English Recording</button>
+<button id="stopRecordingEnglish" disabled>Stop English Recording</button>
+<button id="listenEnglish" style="display:none">Listen English Recording</button>
+<audio id="audioPlayerEnglish" controls style="display:none"></audio>
+<button id="resetEnglish">Reset English Recording</button>
+
+<h2>Hindi Recording</h2>
+<p>{{ hindi_text }}</p>
+<button id="startRecordingHindi">Start Hindi Recording</button>
+<button id="stopRecordingHindi" disabled>Stop Hindi Recording</button>
+<button id="listenHindi" style="display:none">Listen Hindi Recording</button>
+<audio id="audioPlayerHindi" controls style="display:none"></audio>
+<button id="resetHindi">Reset Hindi Recording</button>
+
+<br><br>
+<button id="submitAudio">Submit</button>
+
+<script>
+    let englishRecorder, englishAudioBlob;
+    let hindiRecorder, hindiAudioBlob;
+    let englishChunks = [];
+    let hindiChunks = [];
+
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById('alert-container');
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${type}`;
+        alertDiv.innerText = message;
+        alertContainer.appendChild(alertDiv);
+        setTimeout(() => {
+            alertContainer.removeChild(alertDiv);
+        }, 3000);
+    }
+
+    document.getElementById('startRecordingEnglish').onclick = () => {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                englishRecorder = new MediaRecorder(stream);
+                englishRecorder.ondataavailable = event => {
+                    englishChunks.push(event.data);
+                };
+                englishRecorder.onstop = () => {
+                    englishAudioBlob = new Blob(englishChunks, { type: 'audio/wav' });
+                    document.getElementById('audioPlayerEnglish').src = URL.createObjectURL(englishAudioBlob);
+                    document.getElementById('listenEnglish').style.display = 'block';
+                    document.getElementById('audioPlayerEnglish').style.display = 'none';
+                    englishChunks = [];
+                };
+                englishRecorder.start();
+                document.getElementById('startRecordingEnglish').disabled = true;
+                document.getElementById('stopRecordingEnglish').disabled = false;
+            });
+    };
+
+    document.getElementById('stopRecordingEnglish').onclick = () => {
+        englishRecorder.stop();
+        document.getElementById('startRecordingEnglish').disabled = false;
+        document.getElementById('stopRecordingEnglish').disabled = true;
+    };
+
+    document.getElementById('listenEnglish').onclick = () => {
+        document.getElementById('audioPlayerEnglish').style.display = 'block';
+    };
+
+    document.getElementById('resetEnglish').onclick = () => {
+        englishAudioBlob = null;
+        document.getElementById('audioPlayerEnglish').src = '';
+        document.getElementById('listenEnglish').style.display = 'none';
+        document.getElementById('audioPlayerEnglish').style.display = 'none';
+    };
+
+    document.getElementById('startRecordingHindi').onclick = () => {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                hindiRecorder = new MediaRecorder(stream);
+                hindiRecorder.ondataavailable = event => {
+                    hindiChunks.push(event.data);
+                };
+                hindiRecorder.onstop = () => {
+                    hindiAudioBlob = new Blob(hindiChunks, { type: 'audio/wav' });
+                    document.getElementById('audioPlayerHindi').src = URL.createObjectURL(hindiAudioBlob);
+                    document.getElementById('listenHindi').style.display = 'block';
+                    document.getElementById('audioPlayerHindi').style.display = 'none';
+                    hindiChunks = [];
+                };
+                hindiRecorder.start();
+                document.getElementById('startRecordingHindi').disabled = true;
+                document.getElementById('stopRecordingHindi').disabled = false;
+            });
+    };
+
+    document.getElementById('stopRecordingHindi').onclick = () => {
+        hindiRecorder.stop();
+        document.getElementById('startRecordingHindi').disabled = false;
+        document.getElementById('stopRecordingHindi').disabled = true;
+    };
+
+    document.getElementById('listenHindi').onclick = () => {
+        document.getElementById('audioPlayerHindi').style.display = 'block';
+    };
+
+    document.getElementById('resetHindi').onclick = () => {
+        hindiAudioBlob = null;
+        document.getElementById('audioPlayerHindi').src = '';
+        document.getElementById('listenHindi').style.display = 'none';
+        document.getElementById('audioPlayerHindi').style.display = 'none';
+    };
+
+    document.getElementById('submitAudio').onclick = () => {
+        if (!englishAudioBlob || !hindiAudioBlob) {
+            showAlert('Both recordings are required', 'warning');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('audio_data_english', englishAudioBlob);
+        formData.append('audio_data_hindi', hindiAudioBlob);
+        formData.append('text_id', '{{ text_id }}');
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert(data.message, 'success');
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Files Uploaded, Thank You', 'success');
+        });
+    };
+</script>
+{% endblock %}
