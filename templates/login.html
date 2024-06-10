@@ -1,0 +1,13 @@
+{% extends "layout.html" %} {% block title %}Login{% endblock %} {% block
+content %}
+<div class="form-wrap">
+  <h2 style="text-align: center;">Login</h2>
+  <form method="POST">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required />
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required />
+    <button type="submit">Login</button>
+  </form>
+</div>
+{% endblock %}
