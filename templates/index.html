@@ -1,5 +1,6 @@
-{% extends "layout.html" %} {% block title %}Record Audio{% endblock %} {% block
-content %}
+{% extends "layout.html" %}
+{% block title %}Record Audio{% endblock %}
+{% block content %}
 <h1>Welcome, {{ user_name }}</h1>
 
 <div class="text-rec">
@@ -7,10 +8,12 @@ content %}
     <h2>English Recording</h2>
     <p>{{ english_text }}</p>
     <button id="startRecordingEnglish">Start English Recording</button>
+    <div id="recordingIndicatorEnglish" style="display: none;">
+      <img src="{{ url_for('static', filename='Microphone.gif') }}" alt="Recording..." style="width: 100px;">
+      <b>Recording Started</b>
+    </div>
     <button id="stopRecordingEnglish" disabled>Stop English Recording</button>
-    <button id="listenEnglish" style="display: none">
-      Listen English Recording
-    </button>
+    <button id="listenEnglish" style="display: none">Listen English Recording</button>
     <audio id="audioPlayerEnglish" controls style="display: none"></audio>
     <button id="resetEnglish">Reset English Recording</button>
   </div>
@@ -19,24 +22,34 @@ content %}
     <h2>Hindi Recording</h2>
     <p>{{ hindi_text }}</p>
     <button id="startRecordingHindi">Start Hindi Recording</button>
+    <div id="recordingIndicatorHindi" style="display: none;">
+      <img src="{{ url_for('static', filename='Microphone.gif') }}" alt="Recording..." style="width: 100px;">
+      <b>Recording Started</b>
+    </div>
     <button id="stopRecordingHindi" disabled>Stop Hindi Recording</button>
-    <button id="listenHindi" style="display: none">
-      Listen Hindi Recording
-    </button>
+    <button id="listenHindi" style="display: none">Listen Hindi Recording</button>
     <audio id="audioPlayerHindi" controls style="display: none"></audio>
     <button id="resetHindi">Reset Hindi Recording</button>
   </div>
 </div>
 <div id="submit-btn">
   <button id="submitAudio" style="text-align: center;">Submit</button>
+  <button id="nextAudio" style="text-align: center;">Next</button>
 </div>
 
+<div id="loading-spinner" style="display:none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
 
 <script>
   let englishRecorder, englishAudioBlob;
   let hindiRecorder, hindiAudioBlob;
   let englishChunks = [];
   let hindiChunks = [];
+
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
 
   function showAlert(message, type) {
     const alertContainer = document.getElementById("alert-container");
@@ -49,36 +62,76 @@ content %}
     }, 3000);
   }
 
-  document.getElementById("startRecordingEnglish").onclick = () => {
+  function showLoading() {
+    document.getElementById("loading-spinner").style.display = "block";
+  }
+
+  function hideLoading() {
+    document.getElementById("loading-spinner").style.display = "none";
+  }
+
+  function startRecording(language) {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      englishRecorder = new MediaRecorder(stream);
-      englishRecorder.ondataavailable = (event) => {
-        englishChunks.push(event.data);
+      const source = audioContext.createMediaStreamSource(stream);
+      const destination = audioContext.createMediaStreamDestination();
+      source.connect(destination);
+
+      const recorder = new MediaRecorder(destination.stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        chunks.push(event.data);
       };
-      englishRecorder.onstop = () => {
-        englishAudioBlob = new Blob(englishChunks, { type: "audio/wav" });
-        document.getElementById("audioPlayerEnglish").src =
-          URL.createObjectURL(englishAudioBlob);
-        document.getElementById("listenEnglish").style.display = "block";
-        document.getElementById("audioPlayerEnglish").style.display = "none";
-        englishChunks = [];
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(chunks, { type: "audio/wav" });
+        if (language === 'english') {
+          englishAudioBlob = audioBlob;
+          document.getElementById("audioPlayerEnglish").src = URL.createObjectURL(englishAudioBlob);
+          document.getElementById("listenEnglish").style.display = "block";
+          document.getElementById("audioPlayerEnglish").style.display = "none";
+          englishChunks = [];
+        } else {
+          hindiAudioBlob = audioBlob;
+          document.getElementById("audioPlayerHindi").src = URL.createObjectURL(hindiAudioBlob);
+          document.getElementById("listenHindi").style.display = "block";
+          document.getElementById("audioPlayerHindi").style.display = "none";
+          hindiChunks = [];
+        }
       };
-      englishRecorder.start();
-      document.getElementById("startRecordingEnglish").disabled = true;
-      document.getElementById("stopRecordingEnglish").disabled = false;
+
+      recorder.start();
+      if (language === 'english') {
+        englishRecorder = recorder;
+        document.getElementById("startRecordingEnglish").disabled = true;
+        document.getElementById("stopRecordingEnglish").disabled = false;
+        document.getElementById("recordingIndicatorEnglish").style.display = "block";
+      } else {
+        hindiRecorder = recorder;
+        document.getElementById("startRecordingHindi").disabled = true;
+        document.getElementById("stopRecordingHindi").disabled = false;
+        document.getElementById("recordingIndicatorHindi").style.display = "block";
+      }
     });
-  };
+  }
 
-  document.getElementById("stopRecordingEnglish").onclick = () => {
-    englishRecorder.stop();
-    document.getElementById("startRecordingEnglish").disabled = false;
-    document.getElementById("stopRecordingEnglish").disabled = true;
-  };
+  function stopRecording(language) {
+    if (language === 'english') {
+      englishRecorder.stop();
+      document.getElementById("startRecordingEnglish").disabled = false;
+      document.getElementById("stopRecordingEnglish").disabled = true;
+      document.getElementById("recordingIndicatorEnglish").style.display = "none";
+    } else {
+      hindiRecorder.stop();
+      document.getElementById("startRecordingHindi").disabled = false;
+      document.getElementById("stopRecordingHindi").disabled = true;
+      document.getElementById("recordingIndicatorHindi").style.display = "none";
+    }
+  }
 
-  document.getElementById("listenEnglish").onclick = () => {
-    document.getElementById("audioPlayerEnglish").style.display = "block";
-  };
-
+  document.getElementById("startRecordingEnglish").onclick = () => startRecording('english');
+  document.getElementById("stopRecordingEnglish").onclick = () => stopRecording('english');
+  document.getElementById("listenEnglish").onclick = () => document.getElementById("audioPlayerEnglish").style.display = "block";
   document.getElementById("resetEnglish").onclick = () => {
     englishAudioBlob = null;
     document.getElementById("audioPlayerEnglish").src = "";
@@ -86,36 +139,9 @@ content %}
     document.getElementById("audioPlayerEnglish").style.display = "none";
   };
 
-  document.getElementById("startRecordingHindi").onclick = () => {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      hindiRecorder = new MediaRecorder(stream);
-      hindiRecorder.ondataavailable = (event) => {
-        hindiChunks.push(event.data);
-      };
-      hindiRecorder.onstop = () => {
-        hindiAudioBlob = new Blob(hindiChunks, { type: "audio/wav" });
-        document.getElementById("audioPlayerHindi").src =
-          URL.createObjectURL(hindiAudioBlob);
-        document.getElementById("listenHindi").style.display = "block";
-        document.getElementById("audioPlayerHindi").style.display = "none";
-        hindiChunks = [];
-      };
-      hindiRecorder.start();
-      document.getElementById("startRecordingHindi").disabled = true;
-      document.getElementById("stopRecordingHindi").disabled = false;
-    });
-  };
-
-  document.getElementById("stopRecordingHindi").onclick = () => {
-    hindiRecorder.stop();
-    document.getElementById("startRecordingHindi").disabled = false;
-    document.getElementById("stopRecordingHindi").disabled = true;
-  };
-
-  document.getElementById("listenHindi").onclick = () => {
-    document.getElementById("audioPlayerHindi").style.display = "block";
-  };
-
+  document.getElementById("startRecordingHindi").onclick = () => startRecording('hindi');
+  document.getElementById("stopRecordingHindi").onclick = () => stopRecording('hindi');
+  document.getElementById("listenHindi").onclick = () => document.getElementById("audioPlayerHindi").style.display = "block";
   document.getElementById("resetHindi").onclick = () => {
     hindiAudioBlob = null;
     document.getElementById("audioPlayerHindi").src = "";
@@ -129,6 +155,8 @@ content %}
       return;
     }
 
+    showLoading(); // Show loading spinner
+
     const formData = new FormData();
     formData.append("audio_data_english", englishAudioBlob);
     formData.append("audio_data_hindi", hindiAudioBlob);
@@ -140,6 +168,8 @@ content %}
     })
       .then((response) => response.json())
       .then((data) => {
+        hideLoading(); // Hide loading spinner
+
         if (data.status === "success") {
           showAlert(data.message, "success");
         } else {
@@ -147,8 +177,24 @@ content %}
         }
       })
       .catch((error) => {
-        showAlert("Files Uploaded, Thank You", "success");
+        hideLoading(); // Hide loading spinner
+        showAlert("An error occurred. Please try again later.", "error");
       });
+  };
+
+  document.getElementById("nextAudio").onclick = () => {
+    // Logic to load new text and reset recordings
+    englishAudioBlob = null;
+    hindiAudioBlob = null;
+    document.getElementById("audioPlayerEnglish").src = "";
+    document.getElementById("audioPlayerHindi").src = "";
+    document.getElementById("listenEnglish").style.display = "none";
+    document.getElementById("audioPlayerEnglish").style.display = "none";
+    document.getElementById("listenHindi").style.display = "none";
+    document.getElementById("audioPlayerHindi").style.display = "none";
+    // Fetch new text or redirect to a new recording page
+    // This will depend on your application logic
+    location.reload(); // Example logic to reload the page with new text
   };
 </script>
 {% endblock %}
