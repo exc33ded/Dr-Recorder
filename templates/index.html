@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block title %}Record Audio{% endblock %}
 {% block content %}
+<div id="logo-container">
+  <img src="../logo.jpg" alt="Logo" style="width: 100px;">
+</div>
 <h1>Welcome, {{ user_name }}</h1>
 
 <div class="text-rec">
@@ -178,7 +181,7 @@
       })
       .catch((error) => {
         hideLoading(); // Hide loading spinner
-        showAlert("An error occurred. Please try again later.", "error");
+      //  showAlert("An error occurred. Please try again later.", "error");
       });
   };
 
