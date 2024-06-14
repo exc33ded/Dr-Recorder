@@ -10,9 +10,10 @@ from googleapiclient.http import MediaFileUpload
 import pandas as pd
 import random
 import sqlite3
+import re
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'gfcrdcu vygkct ycytcuoi gygctufc y gvcuylfyt dcfyxtycc lgcr xtcggggggggggg tgcgyxets7iytyultul crt x es67tuyv tf89; 9tdr xuyldrdxrkxfjxtyre876rytdf tyc guytyd f fx'
 RECORD_FOLDER = 'record'
 app.config['RECORD_FOLDER'] = RECORD_FOLDER
 
@@ -24,7 +25,6 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = "drivecloud-425512-d71d80cfa1ad.json"
 PARENT_FOLDER_ID = "1rj8Hd1ckkhdVeRjwPhlyZ-9IqQnVnT94"
 
-import sqlite3
 
 def init_db():
     conn = sqlite3.connect('database.db')
@@ -163,6 +163,31 @@ def register():
             flash("Passwords do not match", "error")
             return redirect(url_for('register'))
         
+        # Password validation
+        if len(password) < 8:
+            flash("Password must be at least 8 characters long", "error")
+            return redirect(url_for('register'))
+        
+        if not re.search(r"[A-Z]", password):
+            flash("Password must contain at least one uppercase letter", "error")
+            return redirect(url_for('register'))
+        
+        if not re.search(r"[a-z]", password):
+            flash("Password must contain at least one lowercase letter", "error")
+            return redirect(url_for('register'))
+        
+        if not re.search(r"\d", password):
+            flash("Password must contain at least one number", "error")
+            return redirect(url_for('register'))
+        
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+            flash("Password must contain at least one special character", "error")
+            return redirect(url_for('register'))
+        
+        if re.search(r"\s", password):
+            flash("Password must not contain spaces", "error")
+            return redirect(url_for('register'))
+        
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         user_id = generate_short_id()
         
@@ -179,6 +204,7 @@ def register():
         finally:
             conn.close()
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
