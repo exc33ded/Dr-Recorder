@@ -5,122 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        nav {
-    background-color: rgb(68, 74, 87);
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-  }
-  
-  ul {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  ul li {
-    margin-right: 20px;
-  }
-  
-  ul li a {
-    color: white;
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-  
-  ul li a:hover {
-    color: lightgreen;
-  }
-  
-  .checkbtn {
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-    display: none;
-  }
-  
-  #check {
-    display: none;
-  }
-  
-  @media (max-width: 768px) {
-    .checkbtn {
-      display: block;
-      order: 1;
-      margin-right: 20px;
-    }
-  
-    ul {
-      position: fixed;
-      top: 80px;
-      right: -100%;
-      background-color: green;
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.3s;
-    }
-  
-    ul li {
-      margin: 20px 0;
-    }
-  
-    ul li a {
-      font-size: 20px;
-    }
-  
-    #check:checked ~ ul {
-      right: 0;
-    }
-  }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background-color: #444a57;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        nav.navbar {
+            background-color: #444a57;
+        }
+
+        nav.navbar a.navbar-brand, nav.navbar a.nav-link {
+            color: white;
+        }
+
+        nav.navbar a.nav-link.active {
+            color: #ffc107;
+        }
+
+        nav.navbar a.nav-link:hover {
+            color: #ffc107;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .alert .closebtn {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .alert .closebtn:hover {
+            color: black;
+        }
     </style>
 </head>
-<body>
-    <header id="header">
-        <div id="logo"><img src="../logo.jpg" alt=""></div>
-        <div>
-            <h1>Voice Recording</h1>
+<header id="header" class="container-fluid">
+    <div class="row align-items-center header-content">
+        <div class="col-auto">
+            <img src="{{ url_for('static', filename='image.png') }}" alt="Logo" class="img-fluid" style="max-width: 100px; height: auto;">
         </div>
-        <div>
+        <div class="col header-title">
+            <h1>Dr. Recorder</h1>
             <p>Your contribution matters</p>
         </div>
-      </header>
-      <nav>
-        <ul>
-            <li><a href="{{ url_for('welcome') }}">Home</a></li>
-			{% if 'user_id' in session %}
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-			{% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('register') }}">Register</a></li>
-			{% endif %}
-        </ul>
-</nav>
-    <div id="alert-container">
+    </div>
+</header>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('welcome') }}">Recorder</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('welcome') }}">Home</a>
+                    </li>
+                    {% if 'user_id' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4" id="alert-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="alert {{ category }}">
+        <div class="alert alert-{{ category }} alert-dismissible fade show border" role="alert">
             {{ message }}
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
         {% endif %}
         {% endwith %}
     </div>
-    {% block content %}{% endblock %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
