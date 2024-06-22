@@ -5,26 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Welcome</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
     />
-    <style>
-      .bd {
-        text-align: center;
-      }
-      
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </head>
   <body>
     {% include 'layout.html' %}
-    <div class="bd">
-      <h1>Welcome to the Audio Recording App</h1>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna
-        vitae odio sodales tempor.
-      </p>
-      <p>
+    <div class="container my-5">
+      <div class="text-center mb-4">
+        <h2>Motivation Behind the Voice Recording App</h2>
+        <p class="text-muted">
+          Discover the benefits and goals of our innovative voice recording app.
+        </p>
+      </div>
+      
+      <div class="card mb-4">
+        <div class="card-body">
+          <p>
+            While there are numerous text-based note-taking applications available,
+            capturing information through speech offers distinct advantages. Our
+            voice recording app aims to address these limitations and revolutionize
+            the field of speech-to-speech translation.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <h4 class="card-title">Key Benefits</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Accessibility:</strong> Voice recording allows for hands-free note-taking,
+              ideal for situations where typing is inconvenient or impractical. This
+              empowers users with mobility limitations or during lectures and
+              conferences.
+            </li>
+            <li class="list-group-item">
+              <strong>Accuracy:</strong> Speech recognition technology continues to evolve,
+              offering high accuracy in capturing spoken words. This eliminates the
+              potential errors associated with manual typing, especially for
+              technical terms or unfamiliar concepts.
+            </li>
+            <li class="list-group-item">
+              <strong>Rich Data Collection:</strong> Speech recordings provide a more nuanced
+              data source compared to plain text. Vocal inflections, tone, and pace
+              can be valuable for speech analysis and translation, leading to more
+              natural-sounding and contextually-aware translations.
+            </li>
+            <li class="list-group-item">
+              <strong>Efficiency:</strong> Speech allows for faster information capture compared
+              to typing. This is particularly beneficial for capturing lengthy
+              lectures or discussions.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <p>
+            By leveraging voice recordings, our app aims to contribute significantly
+            to the field of speech-to-speech translation by providing a rich data
+            source for training and development. This will ultimately lead to more
+            accurate, efficient, and natural-sounding translations that bridge
+            communication gaps across languages.
+          </p>
+          <p>
+            It's important to acknowledge existing speech-to-text applications. Our
+            goal is to build upon these by specifically focusing on data collection
+            for speech translation, potentially offering features like language
+            selection, speaker identification, and diarization (separating speech
+            from background noise).
+          </p>
+        </div>
+      </div>
     </div>
-    {% include 'footer.html' %}
+    {% include "footer.html" %}
   </body>
 </html>
