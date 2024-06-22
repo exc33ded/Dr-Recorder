@@ -154,6 +154,18 @@ def register():
         full_name = request.form['full_name']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
+        gender = request.form['gender']
+        organization = request.form['organization']
+        village = request.form['village']
+        town = request.form['town']
+        district = request.form['district']
+        state = request.form['state']
+        dob = request.form['dob']
+        
+        if gender == '1':
+            gender = "Male"
+        else:
+            gender = "Female"
         
         if not username or not full_name or not password or not confirm_password:
             flash("All fields are required", "error")
@@ -193,8 +205,8 @@ def register():
         
         conn = get_db_connection()
         try:
-            conn.execute('INSERT INTO users (username, full_name, password, user_id) VALUES (?, ?, ?, ?)',
-                         (username, full_name, hashed_password, user_id))
+            conn.execute('INSERT INTO users (username, full_name, password, user_id, gender, organization, village, town, district, state, dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                         (username, full_name, hashed_password, user_id, gender, organization, village, town, district, state, dob))
             conn.commit()
             flash("User registered successfully", "success")
             return redirect(url_for('login'))
