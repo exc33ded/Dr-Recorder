@@ -12,6 +12,7 @@ import random
 import sqlite3
 import re
 from flask_caching import Cache
+from pydub import AudioSegment
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -20,10 +21,6 @@ app.config['RECORD_FOLDER'] = RECORD_FOLDER
 
 if not os.path.exists(RECORD_FOLDER):
     os.makedirs(RECORD_FOLDER)
-
-# Cache configuration
-app.config['CACHE_TYPE'] = 'simple'  # You can use 'redis', 'memcached', etc.
-cache = Cache(app)
 
 # Google Drive API settings
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -54,7 +51,6 @@ def init_db():
 def authenticate():
     return service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
-@cache.memoize(timeout=300)  # Cache for 5 minutes
 def upload_to_drive(file_path, filename):
     creds = authenticate()
     service = build('drive', 'v3', credentials=creds)
@@ -79,58 +75,18 @@ def welcome():
 def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    user_id = session['user_id']
+    full_name = session['full_name']
     
-    if 'random_texts' not in session:
-        df = pd.read_excel('Book1.xlsx')
-        session['random_texts'] = df.sample(n=200).to_dict(orient='records')
-    
-    random_text = random.choice(session['random_texts'])
-    text_id = random_text['Sno']
-    english_text = random_text['English']
-    hindi_text = random_text['Hindi']
+    # Read the Excel file
+    df = pd.read_excel('Book1.xlsx')
+    # Choose a random row
+    random_row = df.sample().iloc[0]
+    text_id = random_row['Sno']
+    english_text = random_row['English']
+    hindi_text = random_row['Hindi']
     
     return render_template('index.html', text_id=text_id, english_text=english_text, hindi_text=hindi_text, user_name=session['full_name'])
-
-# @app.route('/upload', methods=['POST'])
-# def upload_file():
-#     user_name = session.get('user_name')
-#     user_id = session.get('user_id')
-#     text_id = request.form.get('text_id')
-
-#     if 'audio_data_english' not in request.files or 'audio_data_hindi' not in request.files or not user_name or not text_id:
-#         flash("All inputs are required", "error")
-#         return redirect(url_for('index'))
-
-#     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-#     unique_id = generate_short_id()
-
-#     # Process English audio
-#     english_file = request.files['audio_data_english']
-#     english_filename = f"{unique_id}_{user_name}_ENG_{text_id}_{timestamp}.wav"
-#     english_path = os.path.join(app.config['RECORD_FOLDER'], english_filename)
-#     english_file.save(english_path)
-
-#     # Process Hindi audio
-#     hindi_file = request.files['audio_data_hindi']
-#     hindi_filename = f"{unique_id}_{user_name}_HIND_{text_id}_{timestamp}.wav"
-#     hindi_path = os.path.join(app.config['RECORD_FOLDER'], hindi_filename)
-#     hindi_file.save(hindi_path)
-
-#     try:
-#         english_file_id = upload_to_drive(english_path, english_filename)
-#         hindi_file_id = upload_to_drive(hindi_path, hindi_filename)
-
-#         os.remove(english_path)
-#         os.remove(hindi_path)
-
-#         flash("Files uploaded and saved to Google Drive!", "success")
-#     except Exception as e:
-#         flash(f"Failed to upload files to Google Drive: {str(e)}", "error")
-
-#     return redirect(url_for('index'))
-
-
-from pydub import AudioSegment
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -145,52 +101,36 @@ def upload_file():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     unique_id = generate_short_id()
 
-    # Process English audio
-    english_file = request.files['audio_data_english']
-    english_filename = f"{unique_id}_{user_name}_ENG_{text_id}_{timestamp}.wav"
-    english_path = os.path.join(app.config['RECORD_FOLDER'], english_filename)
-
-    # Adjust audio properties using pydub
     try:
+        # Process English audio
+        english_file = request.files['audio_data_english']
+        english_filename = f"{unique_id}_{user_name}_ENG_{text_id}_{timestamp}.wav"
+        english_path = os.path.join(app.config['RECORD_FOLDER'], english_filename)
         english_audio = AudioSegment.from_file(english_file)
-        english_audio = english_audio.set_frame_rate(44100)  # Sample Rate: 44.1 kHz
-        english_audio = english_audio.set_sample_width(2)    # Bit Depth: 16-bit
-        english_audio = english_audio.set_channels(1)        # Channels: Mono
+        english_audio = english_audio.set_frame_rate(44100).set_sample_width(2).set_channels(1)
         english_audio.export(english_path, format='wav')
-    except Exception as e:
-        flash(f"Failed to process English audio: {str(e)}", "error")
-        return redirect(url_for('index'))
 
-    # Process Hindi audio
-    hindi_file = request.files['audio_data_hindi']
-    hindi_filename = f"{unique_id}_{user_name}_HIND_{text_id}_{timestamp}.wav"
-    hindi_path = os.path.join(app.config['RECORD_FOLDER'], hindi_filename)
-
-    # Adjust audio properties using pydub
-    try:
+        # Process Hindi audio
+        hindi_file = request.files['audio_data_hindi']
+        hindi_filename = f"{unique_id}_{user_name}_HIND_{text_id}_{timestamp}.wav"
+        hindi_path = os.path.join(app.config['RECORD_FOLDER'], hindi_filename)
         hindi_audio = AudioSegment.from_file(hindi_file)
-        hindi_audio = hindi_audio.set_frame_rate(44100)    # Sample Rate: 44.1 kHz
-        hindi_audio = hindi_audio.set_sample_width(2)      # Bit Depth: 16-bit
-        hindi_audio = hindi_audio.set_channels(1)          # Channels: Mono
+        hindi_audio = hindi_audio.set_frame_rate(44100).set_sample_width(2).set_channels(1)
         hindi_audio.export(hindi_path, format='wav')
-    except Exception as e:
-        flash(f"Failed to process Hindi audio: {str(e)}", "error")
-        return redirect(url_for('index'))
 
-    try:
+        # Upload to Google Drive
         english_file_id = upload_to_drive(english_path, english_filename)
         hindi_file_id = upload_to_drive(hindi_path, hindi_filename)
 
+        # Clean up
         os.remove(english_path)
         os.remove(hindi_path)
 
         flash("Files uploaded and saved to Google Drive!", "success")
     except Exception as e:
-        flash(f"Failed to upload files to Google Drive: {str(e)}", "error")
+        flash(f"Failed to process or upload files: {str(e)}", "error")
 
     return redirect(url_for('index'))
-
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -252,7 +192,7 @@ def register():
         try:
             conn.execute('''
                 INSERT INTO users (username, full_name, password, user_id, gender, organization, village, town, district, state, dob) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?,                ?, ?, ?)
             ''', (username, full_name, hashed_password, user_id, gender, organization, village, town, district, state, dob))
             conn.commit()
             flash("User registered successfully", "success")
