@@ -36,4 +36,8 @@ tzdata==2024.1
 uritemplate==4.1.1
 urllib3==2.2.1
 Werkzeug==3.0.3
-gunicorn
+SQLAlchemy==2.0.31
+Flask-Caching==2.3.0
+flask-redis==0.4.0
+Flask-Session==0.8.0
+pydub==0.25.1
