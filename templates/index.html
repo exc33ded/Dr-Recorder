@@ -81,50 +81,14 @@
 
     function showLoading() {
       document.getElementById("loading-spinner").style.display = "block";
+      document.getElementById("submitAudio").disabled = true;
+      document.getElementById("nextAudio").disabled = true;
     }
 
     function hideLoading() {
       document.getElementById("loading-spinner").style.display = "none";
-    }
-
-    function writeRIFFHeader(view, length) {
-      const buffer = new ArrayBuffer(44 + length);
-      const dataView = new DataView(buffer);
-
-      function writeString(view, offset, str) {
-        for (let i = 0; i < str.length; i++) {
-          view.setUint8(offset + i, str.charCodeAt(i));
-        }
-      }
-
-      // RIFF identifier
-      writeString(dataView, 0, 'RIFF');
-      // file length
-      dataView.setUint32(4, 36 + length, true);
-      // RIFF type
-      writeString(dataView, 8, 'WAVE');
-      // format chunk identifier (fmt)
-      writeString(dataView, 12, 'fmt ');
-      // format chunk length
-      dataView.setUint32(16, 16, true);
-      // sample format (raw)
-      dataView.setUint16(20, 1, true);
-      // channel count (mono)
-      dataView.setUint16(22, 1, true); // Set channel count to 1 (mono)
-      // sample rate
-      dataView.setUint32(24, 44100, true);
-      // byte rate (sample rate * block align)
-      dataView.setUint32(28, 44100 * 2, true);
-      // block align (channel count * bytes per sample)
-      dataView.setUint16(32, 2, true);
-      // bits per sample
-      dataView.setUint16(34, 16, true);
-      // data chunk identifier (data)
-      writeString(dataView, 36, 'data');
-      // data chunk length
-      dataView.setUint32(40, length, true);
-
-      view.set(dataView);
+      document.getElementById("submitAudio").disabled = false;
+      document.getElementById("nextAudio").disabled = false;
     }
 
     function startRecording(language) {
@@ -195,7 +159,7 @@
     document.getElementById("resetEnglish").onclick = () => {
       englishAudioBlob = null;
       document.getElementById("audioPlayerEnglish").src = "";
-      document.getElementById("listenEnglish").style      .display = "none";
+      document.getElementById("listenEnglish").style.display = "none";
       document.getElementById("audioPlayerEnglish").style.display = "none";
     };
 
@@ -242,11 +206,7 @@
       });
     };
     
-    document.getElementById("nextAudio").onclick = () => {
-      window.location.href = "/next";
-    };
   </script>
   {% endblock %}
 </body>
 </html>
-
