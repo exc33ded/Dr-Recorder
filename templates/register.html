@@ -12,51 +12,90 @@
     <h2 style="text-align: center">Register</h2>
     <form method="POST">
       <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
+        <label for="username" class="form-label">Username <span style="color: red;">*</span></label>
         <input type="text" class="form-control" id="username" placeholder="Username" name="username" required >
       </div>
       <div class="mb-3">
-        <label for="full_name" class="form-label">Full Name</label>
+        <label for="full_name" class="form-label">Full Name <span style="color: red;">*</span></label>
         <input type="text" class="form-control" id="full_name" placeholder="Full Name" name="full_name" required>
       </div>
       <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+        <label for="dob" class="form-label">Date of Birth <span style="color: red;">*</span></label>
+        <input type="date" class="form-control" id="dob" placeholder="DD/MM/YYYY" name="dob" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password (The password should contain at least 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character) <span style="color: red;">*</span></label>
         <input type="password" class="form-control" id="password" placeholder="Password" name="password" required>
       </div>
       <div class="mb-3">
-        <label for="confirm_password" class="form-label">Confirm Password</label>
+        <label for="confirm_password" class="form-label">Confirm Password <span style="color: red;">*</span></label>
         <input type="password" class="form-control" id="confirm_password" placeholder="Confirm Password" name="confirm_password" required>
       </div>
       <div class="mb-3">
-        <label class="form-label" for="gender">Gender</label>
+        <label class="form-label" for="gender">Gender <span style="color: red;">*</span></label>
         <select id="gender" class="form-select" name="gender">
+          <option value="SelectingGender">-----Select Gender-----</option>
           <option value="1">Male</option>
           <option value="0">Female</option>
         </select>
       </div>
       <div class="mb-3">
-        <label for="organization" class="form-label">Organization</label>
+        <label for="organization" class="form-label">Organization <span style="color: red;">*</span></label>
         <input type="text" class="form-control" id="organization" placeholder="Organization/Institution" name="organization" required>
       </div>
       <div class="mb-3">
         <label for="village" class="form-label">Village</label>
-        <input type="text" class="form-control" id="village" placeholder="Village" name="village" required>
+        <input type="text" class="form-control" id="village" placeholder="Village" name="village">
       </div>
       <div class="mb-3">
         <label for="town" class="form-label">Town</label>
-        <input type="text" class="form-control" id="town" placeholder="Town" name="town" required>
+        <input type="text" class="form-control" id="town" placeholder="Town" name="town">
       </div>
       <div class="mb-3">
-        <label for="district" class="form-label">District</label>
+        <label for="district" class="form-label">District <span style="color: red;">*</span></label>
         <input type="text" class="form-control" id="district" placeholder="Your District Name" name="district" required>
       </div>
       <div class="mb-3">
-        <label for="state" class="form-label">State</label>
-        <input type="text" class="form-control" id="state" placeholder="Your State Name" name="state" required>
-      </div>
-      <div class="mb-3">
-        <label for="dob" class="form-label">Date of Birth</label>
-        <input type="date" class="form-control" id="dob" placeholder="DD/MM/YYYY" name="dob" required>
+        <label for="state" class="form-label">State <span style="color: red;">*</span></label>
+        <select id="state" class="form-select" name="state">
+          <option value="Selecting">-----Select State-----</option>
+          <option value="AP">Andhra Pradesh</option>
+          <option value="AR">Arunachal Pradesh</option>
+          <option value="AS">Assam</option>
+          <option value="BR">Bihar</option>
+          <option value="CT">Chhattisgarh</option>
+          <option value="GA">Gujarat</option>
+          <option value="HR">Haryana</option>
+          <option value="HP">Himachal Pradesh</option>
+          <option value="JK">Jammu and Kashmir</option>
+          <option value="GA">Goa</option>
+          <option value="JH">Jharkhand</option>
+          <option value="KA">Karnataka</option>
+          <option value="KL">Kerala</option>
+          <option value="MP">Madhya Pradesh</option>
+          <option value="MH">Maharashtra</option>
+          <option value="MN">Manipur</option>
+          <option value="ML">Meghalaya</option>
+          <option value="MZ">Mizoram</option>
+          <option value="NL">Nagaland</option>
+          <option value="OR">Odisha</option>
+          <option value="PB">Punjab</option>
+          <option value="RJ">Rajasthan</option>
+          <option value="SK">Sikkim</option>
+          <option value="TN">Tamil Nadu</option>
+          <option value="TG">Telangana</option>
+          <option value="TR">Tripura</option>
+          <option value="UT">Uttarakhand</option>
+          <option value="UP">Uttar Pradesh</option>
+          <option value="WB">West Bengal</option>
+          <option value="AN">Andaman and Nicobar Islands</option>
+          <option value="CH">Chandigarh</option>
+          <option value="DN">Dadra and Nagar Haveli</option>
+          <option value="DD">Daman and Diu</option>
+          <option value="DL">Delhi</option>
+          <option value="LD">Lakshadweep</option>
+          <option value="PY">Puducherry</option>
+        </select>
       </div>
       <button class="btn btn-primary" type="submit">Register</button>
     </form>
