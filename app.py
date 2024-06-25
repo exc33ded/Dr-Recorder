@@ -80,15 +80,16 @@ def welcome():
 def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    user_id = session['user_id']
+    full_name = session['full_name']
     
-    if 'random_texts' not in session:
-        df = pd.read_excel('Book1.xlsx')
-        session['random_texts'] = df.sample(n=200).to_dict(orient='records')
-    
-    random_text = random.choice(session['random_texts'])
-    text_id = random_text['Sno']
-    english_text = random_text['English']
-    hindi_text = random_text['Hindi']
+    # Read the Excel file
+    df = pd.read_excel('Book1.xlsx')
+    # Choose a random row
+    random_row = df.sample().iloc[0]
+    text_id = random_row['Sno']
+    english_text = random_row['English']
+    hindi_text = random_row['Hindi']
     
     return render_template('index.html', text_id=text_id, english_text=english_text, hindi_text=hindi_text, user_name=session['full_name'])
 
