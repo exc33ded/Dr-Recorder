@@ -93,7 +93,6 @@ def index():
     
     return render_template('index.html', text_id=text_id, english_text=english_text, hindi_text=hindi_text, user_name=session['full_name'])
 
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     user_name = session.get('user_name')
@@ -109,7 +108,7 @@ def upload_file():
 
     # Process English audio
     english_file = request.files['audio_data_english']
-    english_filename = f"{unique_id}_{user_name}_ENG_{text_id}_{timestamp}.wav"
+    english_filename = f"{user_name}_ENG_{text_id}_{timestamp}.wav"
     english_path = os.path.join(app.config['RECORD_FOLDER'], english_filename)
 
     # Adjust audio properties using pydub
@@ -125,7 +124,7 @@ def upload_file():
 
     # Process Hindi audio
     hindi_file = request.files['audio_data_hindi']
-    hindi_filename = f"{unique_id}_{user_name}_HIND_{text_id}_{timestamp}.wav"
+    hindi_filename = f"{user_name}_HIND_{text_id}_{timestamp}.wav"
     hindi_path = os.path.join(app.config['RECORD_FOLDER'], hindi_filename)
 
     # Adjust audio properties using pydub
@@ -150,8 +149,6 @@ def upload_file():
         flash(f"Failed to upload files to Google Drive: {str(e)}", "error")
 
     return redirect(url_for('index'))
-
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -227,11 +224,17 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        if session.get('login_in_progress'):
+            flash("Login already in progress, please wait...", "error")
+            return redirect(url_for('login'))
+
+        session['login_in_progress'] = True
         username = request.form['username']
         password = request.form['password']
 
         if not username or not password:
             flash("All fields are required", "error")
+            session.pop('login_in_progress', None)
             return redirect(url_for('login'))
 
         conn = get_db_connection()
@@ -243,8 +246,11 @@ def login():
             session['user_name'] = user['username']
             session['full_name'] = user['full_name']
             flash("Login successful", "success")
+            session.pop('login_in_progress', None)
             return redirect(url_for('index'))
+        
         flash("Invalid username or password", "error")
+        session.pop('login_in_progress', None)
     return render_template('login.html')
 
 @app.route('/logout')
