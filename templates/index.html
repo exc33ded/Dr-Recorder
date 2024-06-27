@@ -48,7 +48,7 @@
   <div class="container my-3" id="submit-btn">
     <div class="text-center">
       <button class="btn btn-dark mx-2" id="submitAudio">Submit</button>
-      <button class="btn btn-dark mx-2" id="nextAudio"><a class="nav-link" href="{{ url_for('index') }}">Next Audio</a></button>
+      <a class="btn btn-dark mx-2" id="nextAudio" href="{{ url_for('index') }}" style="margin-top: 30px;">Next Audio</a>
     </div>
   </div>
   <div id="loading-spinner" style="display: none">
@@ -174,18 +174,22 @@
     };
     
     document.getElementById("submitAudio").onclick = () => {
+      // Disable submit button
+      document.getElementById("submitAudio").disabled = true;
+
       if (!englishAudioBlob || !hindiAudioBlob) {
         showAlert("Both recordings are required", "warning");
+        document.getElementById("submitAudio").disabled = false; // Re-enable submit button
         return;
       }
-    
+
       showLoading();
-    
+
       const formData = new FormData();
       formData.append("audio_data_english", englishAudioBlob, "english.wav");
       formData.append("audio_data_hindi", hindiAudioBlob, "hindi.wav");
       formData.append("text_id", "{{ text_id }}");
-    
+
       fetch("/upload", {
         method: "POST",
         body: formData,
@@ -193,19 +197,27 @@
       .then((response) => response.json())
       .then((data) => {
         hideLoading();
-    
+
         if (data.status === "success") {
           showAlert(data.message, "success");
+          document.getElementById("submitAudio").disabled = true; // Keep submit button disabled
         } else {
           showAlert(data.message, "error");
+          document.getElementById("submitAudio").disabled = true; // Re-enable submit button on error
         }
       })
       .catch((error) => {
         hideLoading();
-        showAlert("Recording have been submited!!!", "success");
+        showAlert("Recording have been succesfully uploaded", "success");
+        document.getElementById("submitAudio").disabled = false; // Re-enable submit button on catch
       });
     };
-    
+
+    // Enable submit button on next audio click
+    document.getElementById("nextAudio").onclick = () => {
+      document.getElementById("submitAudio").disabled = false; // Enable submit button
+    };
+
   </script>
   {% endblock %}
 </body>
