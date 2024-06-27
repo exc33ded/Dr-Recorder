@@ -76,16 +76,14 @@ def generate_short_id():
 def welcome():
     return render_template('welcome.html')
 
+df = pd.read_excel('Book1.xlsx')
+
 @app.route('/index')
 def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    user_id = session['user_id']
-    full_name = session['full_name']
     
-    # Read the Excel file
-    df = pd.read_excel('Book1.xlsx')
-    # Choose a random row
+    # Choose a random row from preloaded data
     random_row = df.sample().iloc[0]
     text_id = random_row['Sno']
     english_text = random_row['English']
