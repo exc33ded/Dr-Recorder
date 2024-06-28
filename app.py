@@ -176,30 +176,30 @@ def register():
             flash("Passwords do not match", "error")
             return redirect(url_for('register'))
 
-        # Password validation
-        if len(password) < 8:
-            flash("Password must be at least 8 characters long", "error")
-            return redirect(url_for('register'))
+        # # Password validation
+        # if len(password) < 8:
+        #     flash("Password must be at least 8 characters long", "error")
+        #     return redirect(url_for('register'))
 
-        if not re.search(r"[A-Z]", password):
-            flash("Password must contain at least one uppercase letter", "error")
-            return redirect(url_for('register'))
+        # if not re.search(r"[A-Z]", password):
+        #     flash("Password must contain at least one uppercase letter", "error")
+        #     return redirect(url_for('register'))
 
-        if not re.search(r"[a-z]", password):
-            flash("Password must contain at least one lowercase letter", "error")
-            return redirect(url_for('register'))
+        # if not re.search(r"[a-z]", password):
+        #     flash("Password must contain at least one lowercase letter", "error")
+        #     return redirect(url_for('register'))
 
-        if not re.search(r"\d", password):
-            flash("Password must contain at least one number", "error")
-            return redirect(url_for('register'))
+        # if not re.search(r"\d", password):
+        #     flash("Password must contain at least one number", "error")
+        #     return redirect(url_for('register'))
 
-        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-            flash("Password must contain at least one special character", "error")
-            return redirect(url_for('register'))
+        # if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        #     flash("Password must contain at least one special character", "error")
+        #     return redirect(url_for('register'))
 
-        if re.search(r"\s", password):
-            flash("Password must not contain spaces", "error")
-            return redirect(url_for('register'))
+        # if re.search(r"\s", password):
+        #     flash("Password must not contain spaces", "error")
+        #     return redirect(url_for('register'))
 
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         user_id = generate_short_id()
