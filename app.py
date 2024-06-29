@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import uuid
@@ -256,6 +256,13 @@ def logout():
     session.clear()
     flash("Logged out successfully", "success")
     return redirect(url_for('login'))
+
+@app.route('/download-db-this-is-not-supposed-to-be-known', methods=['GET'])
+def download_db():
+    try:
+        return send_from_directory(directory=app.root_path, path='database.db', as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
 
 if __name__ == '__main__':
     init_db()
