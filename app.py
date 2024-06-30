@@ -257,12 +257,26 @@ def logout():
     flash("Logged out successfully", "success")
     return redirect(url_for('login'))
 
-@app.route('/download-db-this-is-not-supposed-to-be-known', methods=['GET'])
-def download_db():
+@app.route('/upload-db-to-drive', methods=['GET'])
+def upload_db_to_drive():
+    db_path = os.path.join(app.root_path, 'database.db')
+    db_filename = 'database.db'
+
     try:
-        return send_from_directory(directory=app.root_path, path='database.db', as_attachment=True)
-    except FileNotFoundError:
-        abort(404)
+        # Check if the database file exists
+        if not os.path.exists(db_path):
+            flash("Database file not found", "error")
+            return redirect(url_for('index'))
+
+        # Upload the database to Google Drive
+        db_file_id = upload_to_drive(db_path, db_filename)
+        
+        flash("Database uploaded to Google Drive successfully. Task Completed", "success")
+        return redirect(url_for('index'))
+
+    except Exception as e:
+        flash(f"Failed to upload database to Google Drive: {str(e)}", "error")
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     init_db()
