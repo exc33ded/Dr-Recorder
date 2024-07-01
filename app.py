@@ -28,7 +28,7 @@ cache = Cache(app)
 
 # Google Drive API settings
 SCOPES = ['https://www.googleapis.com/auth/drive']
-SERVICE_ACCOUNT_FILE = "drivecloud-425512-d71d80cfa1ad.json"
+SERVICE_ACCOUNT_FILE = "drivecloud-425512-1a0a2c4ec5d0.json"
 PARENT_FOLDER_ID = "1rj8Hd1ckkhdVeRjwPhlyZ-9IqQnVnT94"
 
 def init_db():
