@@ -148,6 +148,25 @@ def upload_file():
 
     return redirect(url_for('index'))
 
+def upload_database_to_drive():
+    db_path = os.path.join(app.root_path, 'database.db')
+    db_filename = 'database.db'
+
+    try:
+        # Check if the database file exists
+        if not os.path.exists(db_path):
+            flash("Database file not found", "error")
+            return False
+
+        # Upload the database to Google Drive
+        db_file_id = upload_to_drive(db_path, db_filename)
+        
+        return True
+
+    except Exception as e:
+        flash(f"Failed to upload database to Google Drive: {str(e)}", "error")
+        return False
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -176,31 +195,6 @@ def register():
             flash("Passwords do not match", "error")
             return redirect(url_for('register'))
 
-        # # Password validation
-        # if len(password) < 8:
-        #     flash("Password must be at least 8 characters long", "error")
-        #     return redirect(url_for('register'))
-
-        # if not re.search(r"[A-Z]", password):
-        #     flash("Password must contain at least one uppercase letter", "error")
-        #     return redirect(url_for('register'))
-
-        # if not re.search(r"[a-z]", password):
-        #     flash("Password must contain at least one lowercase letter", "error")
-        #     return redirect(url_for('register'))
-
-        # if not re.search(r"\d", password):
-        #     flash("Password must contain at least one number", "error")
-        #     return redirect(url_for('register'))
-
-        # if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-        #     flash("Password must contain at least one special character", "error")
-        #     return redirect(url_for('register'))
-
-        # if re.search(r"\s", password):
-        #     flash("Password must not contain spaces", "error")
-        #     return redirect(url_for('register'))
-
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         user_id = generate_short_id()
 
@@ -212,6 +206,10 @@ def register():
             ''', (username, full_name, hashed_password, user_id, gender, organization, village, town, district, state, dob))
             conn.commit()
             flash("User registered successfully", "success")
+
+            # Upload database to Google Drive after successful registration
+            upload_database_to_drive()
+
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash("Username already exists", "error")
@@ -258,26 +256,11 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/upload-db-to-drive', methods=['GET'])
-def upload_db_to_drive():
-    db_path = os.path.join(app.root_path, 'database.db')
-    db_filename = 'database.db'
-
-    try:
-        # Check if the database file exists
-        if not os.path.exists(db_path):
-            flash("Database file not found", "error")
-            return redirect(url_for('index'))
-
-        # Upload the database to Google Drive
-        db_file_id = upload_to_drive(db_path, db_filename)
-        
-        flash("Database uploaded to Google Drive successfully. Task Completed", "success")
+def upload_db_to_drive_route():
+    if upload_database_to_drive():
         return redirect(url_for('index'))
-
-    except Exception as e:
-        flash(f"Failed to upload database to Google Drive: {str(e)}", "error")
-        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)
+    app.run(debug=False)
