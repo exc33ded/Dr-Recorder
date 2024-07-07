@@ -263,4 +263,4 @@ def upload_db_to_drive_route():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=False)
+    app.run(debug=True)
