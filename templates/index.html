@@ -51,7 +51,7 @@
       </div>
     </div>
   </div>
-  <div class="container my-3" id="submit-btn">
+  <div class="container my-3 mb-5" id="submit-btn">
     <div class="text-center">
       <button class="btn btn-dark mx-2" id="submitAudio">Submit</button>
       <a class="btn btn-dark mx-2" id="nextAudio" href="{{ url_for('index') }}" style="margin-top: 30px;">Next Audio</a>
@@ -63,6 +63,7 @@
     </div>
   </div>
   <div id="alert-container"></div> <!-- Alert container for showing messages -->
+  <div class="mb-5"></div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let englishRecorder, englishAudioBlob;
@@ -225,3 +226,4 @@
   {% endblock %}
 </body>
 </html>
+{% include "footer.html" %}
