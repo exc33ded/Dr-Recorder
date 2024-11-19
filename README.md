@@ -1,6 +1,6 @@
 # Dr. Recorder 🎙️
 
-- Dr. Recorder is a user-friendly application that lets you capture audio recordings easily.  Whether you're taking notes in a lecture, recording a meeting, or capturing a creative idea, Dr. Recorder is here to help! You can modify the product to serve your needs.
+- Dr. Recorder is an intuitive and versatile application designed to seamlessly capture and store audio recordings in both Hindi and English. It serves as a comprehensive database for managing your audio files, while also bridging the gap between Hindi and English through direct speech-to-speech translation. Whether for personal use, professional needs, or language learning, Dr. Recorder makes audio recording, storage, and translation effortless and efficient.
 
 ---  
 ## Table of Contents
